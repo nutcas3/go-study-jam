@@ -13,17 +13,40 @@ func main() {
 		return
 	}
 
-	fmt.Println("Welcome to calculator\n\nSpecifying the operand to be used for operations. Choose between 'add', 'sub', 'mul' or 'div'.")
-
-	var operation, input1, input2 string
+	fmt.Println("Welcome to calculator\n\nSpecifying the operand to be used for operations. Choose between 'add', 'addIterable','sub', 'mul' or 'div'.")
+	fmt.Println("Note: 'addIterable' allows you to add multiple numbers at once.")
+	var operation, input1, input2, digitCount string
 
 	fmt.Scan(&operation)
 
-	if strings.ToLower(operation) != "add" && strings.ToLower(operation) != "sub" && strings.ToLower(operation) != "mul" && strings.ToLower(operation) != "div" {
-		fmt.Println("Invalid sign: Pick from 'add', 'sub', 'mul' or 'div'")
+	if strings.ToLower(operation) != "add" && strings.ToLower(operation) != "sub" && strings.ToLower(operation) != "mul" && strings.ToLower(operation) != "div" && strings.ToLower(operation) != "additerable" {
+		fmt.Println("Invalid sign: Pick from 'add', 'addIterable','sub', 'mul' or 'div'")
 		return
 	}
+    if strings.ToLower(operation) == "additerable" {
+		fmt.Printf("How many numbers do you wish to input? ")
+		fmt.Scan(&digitCount)
+		count, err1 := strconv.Atoi(digitCount)
+		checkError(err1)
+		num := make([]float64, 0, count)
+		for i := 0; i < int(count); i++ {
+			var input string
+			fmt.Printf("Enter input %d: ", i+1)
+			fmt.Scan(&input)
+			input_, loopErr := strconv.ParseFloat(input, 64)
+			checkError(loopErr)
+			num = append(num, input_)
+		}
+		if len(num) == 0 {
+			fmt.Println("No numbers were provided for addition.")
+			return	
+		}
+		result, err := addIterable(num)
+		checkError(err)
+		fmt.Printf("\nResult: %v\n", result)
+		return
 
+	}
 	fmt.Printf("You chose %q for the arithemtic sign. Input your first number\n", operation)
 	fmt.Scan(&input1)
 
@@ -74,6 +97,14 @@ func divide(num1, num2 float64) float64 {
 		return 0.0
 	}
 	return num1 / num2
+}
+
+func addIterable(nums []float64 ) (float64, error) {
+	var sum float64
+	for _, num := range nums {
+		sum += num
+	}
+	return sum, nil
 }
 
 func checkError(err error) {
