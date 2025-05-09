@@ -1,6 +1,7 @@
 package main
 
 import (
+	"calculator/operations"
 	"fmt"
 	"os"
 	"strconv"
@@ -13,72 +14,64 @@ func main() {
 		return
 	}
 
-	fmt.Println("Welcome to calculator\n\nSpecifying the operand to be used for operations. Choose between 'add', 'sub', 'mul' or 'div'.")
+	fmt.Println("Welcome to calculator.\nChoose an operation: 'add', 'sub', 'mul', or 'div'.")
 
-	var operation, input1, input2 string
+	// The significance of the infinite loop at this point is to ensure the calculator runs even after a successful operation. Closes when the user exits.
+	for {
+		var operation string
 
-	fmt.Scan(&operation)
+		// The infinite loop at this point ensures the operation persists until a valid operation is provided.
+		for {
+			fmt.Print("\nEnter operation: ")
+			fmt.Scan(&operation)
+			operation = strings.ToLower(strings.TrimSpace(operation))
 
-	if strings.ToLower(operation) != "add" && strings.ToLower(operation) != "sub" && strings.ToLower(operation) != "mul" && strings.ToLower(operation) != "div" {
-		fmt.Println("Invalid sign: Pick from 'add', 'sub', 'mul' or 'div'")
-		return
-	}
+			if operation == "add" || operation == "sub" || operation == "mul" || operation == "div" {
+				break
+			}
+			fmt.Println("Invalid operation. Choose from 'add', 'sub', 'mul', or 'div'.")
+		}
 
-	fmt.Printf("You chose %q for the arithemtic sign. Input your first number\n", operation)
-	fmt.Scan(&input1)
+		// Only proceeds to the next step if a valid number is provided by the user.
+		var input1 string
+		var num1 float64
+		for {
+			fmt.Print("Enter input 1: ")
+			fmt.Scan(&input1)
+			n1, err := strconv.ParseFloat(strings.TrimSpace(input1), 64)
+			if err == nil {
+				num1 = n1
+				break
+			}
+			fmt.Println("Invalid number. Try again.")
+		}
 
-	fmt.Printf("You chose %q as your first number. Input your second number\n", input1)
-	fmt.Scan(&input2)
+		// Only proceeds to the next step if a valid number is provided by the user.
+		var input2 string
+		var num2 float64
+		for {
+			fmt.Print("Enter input 2: ")
+			fmt.Scan(&input2)
+			n2, err := strconv.ParseFloat(strings.TrimSpace(input2), 64)
+			if err == nil {
+				num2 = n2
+				break
+			}
+			fmt.Println("Invalid number. Try again.")
+		}
 
-	fmt.Printf("You chose %q as your second number.\n", input2)
+		var result float64
 
-	num1, err1 := strconv.ParseFloat(input1, 64)
-	checkError(err1)
-
-	num2, err2 := strconv.ParseFloat(input2, 64)
-	checkError(err2)
-
-	var result float64
-
-	switch strings.ToLower(operation) {
-	case "add":
-		result = add(num1, num2)
-	case "sub":
-		result = subtract(num1, num2)
-	case "mul":
-		result = multiply(num1, num2)
-	case "div":
-		result = divide(num1, num2)
-	default:
-		fmt.Println("Unknown operation.")
-		return
-	}
-	fmt.Printf("\nResult: %v\n", result)
-}
-
-func add(num1, num2 float64) float64 {
-	return num1 + num2
-}
-
-func subtract(num1, num2 float64) float64 {
-	return num1 - num2
-}
-
-func multiply(num1, num2 float64) float64 {
-	return num1 * num2
-}
-
-func divide(num1, num2 float64) float64 {
-	if num2 == 0 {
-		fmt.Println("Cannot divide by zero.")
-		return 0.0
-	}
-	return num1 / num2
-}
-
-func checkError(err error) {
-	if err != nil {
-		fmt.Println("Invalid numbers.")
-		return
+		switch operation {
+		case "add":
+			result = operations.Add(num1, num2)
+		case "sub":
+			result = operations.Subtract(num1, num2)
+		case "mul":
+			result = operations.Multiply(num1, num2)
+		case "div":
+			result = operations.Divide(num1, num2)
+		}
+		fmt.Printf("Result: %v\n", result)
 	}
 }
