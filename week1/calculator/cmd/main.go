@@ -1,6 +1,7 @@
 package main
 
 import (
+	"calculator/operations"
 	"fmt"
 	"os"
 	"strconv"
@@ -13,103 +14,109 @@ func main() {
 		return
 	}
 
-	fmt.Println("Welcome to calculator\n\nSpecifying the operand to be used for operations. Choose between 'add', 'addIterable','sub', 'mul' or 'div'.")
-	fmt.Println("Note: 'addIterable' allows you to add multiple numbers at once.")
-	var operation, input1, input2, digitCount string
+	fmt.Println("Welcome to calculator.\nChoose an operation: 'add', 'addIterable', 'sub', 'mul', or 'div'.\nNote: 'addIterable' allows you to add multiple numbers at once.")
 
-	fmt.Scan(&operation)
+	// The significance of the infinite loop at this point is to ensure the calculator runs even after a successful operation. Closes when the user exits.
+	for {
+		var operation, digitCount string
 
-	if strings.ToLower(operation) != "add" && strings.ToLower(operation) != "sub" && strings.ToLower(operation) != "mul" && strings.ToLower(operation) != "div" && strings.ToLower(operation) != "additerable" {
-		fmt.Println("Invalid sign: Pick from 'add', 'addIterable','sub', 'mul' or 'div'")
-		return
-	}
-    if strings.ToLower(operation) == "additerable" {
-		fmt.Printf("How many numbers do you wish to input? ")
-		fmt.Scan(&digitCount)
-		count, err1 := strconv.Atoi(digitCount)
-		checkError(err1)
-		num := make([]float64, 0, count)
-		for i := 0; i < int(count); i++ {
-			var input string
-			fmt.Printf("Enter input %d: ", i+1)
-			fmt.Scan(&input)
-			input_, loopErr := strconv.ParseFloat(input, 64)
-			checkError(loopErr)
-			num = append(num, input_)
+		// The infinite loop at this point ensures the operation persists until a valid operation is provided.
+		for {
+			fmt.Print("\nEnter operation: ")
+			fmt.Scan(&operation)
+			operation = strings.ToLower(strings.TrimSpace(operation))
+
+			if operation == "add" || operation == "additerable" || operation == "sub" || operation == "mul" || operation == "div" {
+				if operation == "additerable" {
+					fmt.Print("How many numbers do you wish to input? ")
+					fmt.Scan(&digitCount)
+
+					count, err := strconv.Atoi(digitCount)
+					checkError(err)
+
+					num := make([]float64, 0, count)
+
+					for i := 0; i < int(count); i++ {
+						var input string
+
+						fmt.Printf("Enter input %d: ", i+1)
+						fmt.Scan(&input)
+
+						input_, loopErr := strconv.ParseFloat(input, 64)
+						checkError(loopErr)
+
+						num = append(num, input_)
+					}
+
+					// Used continue intead of return for this block to let the calculator skip the rest of the opration.
+					if len(num) == 0 {
+						fmt.Println("No numbers were provided for addition.")
+						continue
+					}
+					result, err := operations.AddIterable(num)
+					checkError(err)
+					fmt.Printf("Result: %v\n", result)
+					continue
+				}
+				break
+			}
+			fmt.Println("Invalid operation. Choose from 'add', 'addIterable', 'sub', 'mul', or 'div'.")
 		}
-		if len(num) == 0 {
-			fmt.Println("No numbers were provided for addition.")
-			return	
+
+		// Only proceeds to the next step if a valid number is provided by the user.
+		var input1 string
+		var num1 float64
+		for {
+			fmt.Print("Enter input 1: ")
+			fmt.Scan(&input1)
+			n1, err := strconv.ParseFloat(strings.TrimSpace(input1), 64)
+			if err == nil {
+				num1 = n1
+				break
+			}
+			fmt.Println("Invalid number. Try again.")
 		}
-		result, err := addIterable(num)
-		checkError(err)
-		fmt.Printf("\nResult: %v\n", result)
-		return
 
+		// Only proceeds to the next step if a valid number is provided by the user.
+		var input2 string
+		var num2 float64
+		for {
+			fmt.Print("Enter input 2: ")
+			fmt.Scan(&input2)
+			n2, err := strconv.ParseFloat(strings.TrimSpace(input2), 64)
+			if err == nil {
+				num2 = n2
+				break
+			}
+			fmt.Println("Invalid number. Try again.")
+		}
+
+		var (
+			result float64
+			err    error
+		)
+
+		switch operation {
+		case "add":
+			result, err = operations.Add(num1, num2)
+			checkError(err)
+		case "sub":
+			result, err = operations.Subtract(num1, num2)
+			checkError(err)
+		case "mul":
+			result, err = operations.Multiply(num1, num2)
+			checkError(err)
+		case "div":
+			result, err = operations.Divide(num1, num2)
+			checkError(err)
+		}
+		fmt.Printf("Result: %v\n", result)
 	}
-	fmt.Printf("You chose %q for the arithemtic sign. Input your first number\n", operation)
-	fmt.Scan(&input1)
-
-	fmt.Printf("You chose %q as your first number. Input your second number\n", input1)
-	fmt.Scan(&input2)
-
-	fmt.Printf("You chose %q as your second number.\n", input2)
-
-	num1, err1 := strconv.ParseFloat(input1, 64)
-	checkError(err1)
-
-	num2, err2 := strconv.ParseFloat(input2, 64)
-	checkError(err2)
-
-	var result float64
-
-	switch strings.ToLower(operation) {
-	case "add":
-		result = add(num1, num2)
-	case "sub":
-		result = subtract(num1, num2)
-	case "mul":
-		result = multiply(num1, num2)
-	case "div":
-		result = divide(num1, num2)
-	default:
-		fmt.Println("Unknown operation.")
-		return
-	}
-	fmt.Printf("\nResult: %v\n", result)
-}
-
-func add(num1, num2 float64) float64 {
-	return num1 + num2
-}
-
-func subtract(num1, num2 float64) float64 {
-	return num1 - num2
-}
-
-func multiply(num1, num2 float64) float64 {
-	return num1 * num2
-}
-
-func divide(num1, num2 float64) float64 {
-	if num2 == 0 {
-		fmt.Println("Cannot divide by zero.")
-		return 0.0
-	}
-	return num1 / num2
-}
-
-func addIterable(nums []float64 ) (float64, error) {
-	var sum float64
-	for _, num := range nums {
-		sum += num
-	}
-	return sum, nil
 }
 
 func checkError(err error) {
 	if err != nil {
-		fmt.Println("Invalid numbers.")
+		fmt.Println("Invalid number.")
 		return
 	}
 }
