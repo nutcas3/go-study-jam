@@ -6,7 +6,6 @@
 - Maps.
 
 ## Day 4 (May 10th)
-- Functions: parameters, return values.
 - Error handling.
 - Defer, Panic, and Recover.
 
