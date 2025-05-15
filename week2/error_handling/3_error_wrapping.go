@@ -24,6 +24,7 @@ func main() {
 	}
 }
 
+
 // Function that processes a configuration file
 func processConfig(filename string) error {
 	// Try to read the file
