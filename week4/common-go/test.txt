@@ -1,0 +1,2 @@
+Hello, Go File Operations!
+This is a test file.
