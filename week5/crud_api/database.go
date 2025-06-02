@@ -8,6 +8,11 @@ import (
 
 var db *sql.DB
 
+type Item struct {
+	ID   int64  `json:"id"`
+	Name string `json:"name"`
+}
+
 func InitDB(dataSourceName string) {
 	var err error
 	db, err = sql.Open("sqlite3", dataSourceName)

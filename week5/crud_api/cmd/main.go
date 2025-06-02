@@ -1,49 +1,34 @@
 package main
 
 import (
-	"encoding/json"
+	"crud_api/database"
+	"crud_api/handlers"
 	"log"
 	"net/http"
+	"strings"
 )
 
-type Item struct {
-	ID   int    `json:"id"`
-	Name string `json:"name"`
-}
-
 func main() {
-	InitDB("items.db")
-	http.HandleFunc("/items", itemsHandler)
+	// Initialize the database
+	database.InitDB("items.db")
+	
+	// Set up the router
+	http.HandleFunc("/items", itemsRouter)
+	http.HandleFunc("/items/", itemsRouter)
+	
+	// Start the server
 	log.Println("CRUD API server running on :8080")
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
 
-func itemsHandler(w http.ResponseWriter, r *http.Request) {
-	switch r.Method {
-	case http.MethodGet:
-		items, err := GetAllItems()
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte("Failed to fetch items"))
-			return
-		}
-		json.NewEncoder(w).Encode(items)
-	case http.MethodPost:
-		var it Item
-		if err := json.NewDecoder(r.Body).Decode(&it); err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			return
-		}
-		id, err := InsertItem(it.Name)
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte("Failed to insert item"))
-			return
-		}
-		it.ID = int(id)
-		w.WriteHeader(http.StatusCreated)
-		json.NewEncoder(w).Encode(it)
-	default:
-		w.WriteHeader(http.StatusMethodNotAllowed)
+// itemsRouter routes all requests to the items handler
+func itemsRouter(w http.ResponseWriter, r *http.Request) {
+	// Simple routing based on the URL path
+	if r.URL.Path == "/items" || strings.HasPrefix(r.URL.Path, "/items/") {
+		handlers.ItemsHandler(w, r)
+		return
 	}
+	
+	// If we get here, the path is not supported
+	w.WriteHeader(http.StatusNotFound)
 }
