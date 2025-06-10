@@ -9,6 +9,7 @@ import (
 	"task_manager_api/models"
 	"testing"
 	"time"
+	"strconv"
 )
 
 // setupTest initializes the test environment
@@ -171,6 +172,7 @@ func TestGetTaskByID(t *testing.T) {
 	}
 
 	// Test cases
+	strId := strconv.FormatInt(id, 10)
 	testCases := []struct {
 		name       string
 		taskID     string
@@ -178,7 +180,7 @@ func TestGetTaskByID(t *testing.T) {
 	}{
 		{
 			name:       "Existing Task",
-			taskID:     "/tasks/" + string(id),
+			taskID:     "/tasks/" + strId,
 			wantStatus: http.StatusOK,
 		},
 		{
@@ -253,6 +255,7 @@ func TestUpdateTask(t *testing.T) {
 	}
 
 	// Test cases
+	strId := strconv.FormatInt(id, 10)
 	testCases := []struct {
 		name       string
 		taskID     string
@@ -261,7 +264,7 @@ func TestUpdateTask(t *testing.T) {
 	}{
 		{
 			name:   "Update Title",
-			taskID: "/tasks/" + string(id),
+			taskID: "/tasks/" + strId,
 			updateTask: models.Task{
 				Title: "Updated Title",
 			},
@@ -269,7 +272,7 @@ func TestUpdateTask(t *testing.T) {
 		},
 		{
 			name:   "Update Status",
-			taskID: "/tasks/" + string(id),
+			taskID: "/tasks/" + strId,
 			updateTask: models.Task{
 				Status: "completed",
 			},
@@ -359,6 +362,7 @@ func TestDeleteTask(t *testing.T) {
 	}
 
 	// Test cases
+	strId := strconv.FormatInt(id, 10)
 	testCases := []struct {
 		name       string
 		taskID     string
@@ -366,7 +370,7 @@ func TestDeleteTask(t *testing.T) {
 	}{
 		{
 			name:       "Existing Task",
-			taskID:     "/tasks/" + string(id),
+			taskID:     "/tasks/" + strId,
 			wantStatus: http.StatusOK,
 		},
 		{
